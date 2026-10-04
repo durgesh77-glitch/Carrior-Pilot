@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CareerPath AI — Career Guidance</title>
+<style>
+:root{--bg:#f6f8fc;--surface:#fff;--text:#152238;--muted:#6d7b90;--line:#e3e9f2;--primary:#315efb;--primary2:#214bd8;--soft:#edf2ff;--success:#138a5b;--warn:#b66a05;--danger:#b42318;--shadow:0 12px 35px rgba(25,45,75,.07);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text)}button,input,textarea,select{font:inherit}button{cursor:pointer}.app{min-height:100vh;display:grid;grid-template-columns:250px 1fr}.sidebar{background:#fff;border-right:1px solid var(--line);padding:22px 14px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column}.brand{font-weight:850;font-size:21px;padding:10px 12px 24px;letter-spacing:-.03em}.brand span{color:var(--primary)}.nav{display:grid;gap:5px}.nav button{border:0;background:transparent;color:#66758a;text-align:left;padding:11px 12px;border-radius:10px;font-weight:700}.nav button:hover,.nav button.active{background:var(--soft);color:var(--primary)}.sideBottom{margin-top:auto;padding:12px}.userChip{padding:12px;border:1px solid var(--line);border-radius:13px;background:#fafcff}.userChip strong{display:block;font-size:13px}.userChip span{display:block;color:var(--muted);font-size:11px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.main{min-width:0}.topbar{height:72px;background:rgba(255,255,255,.88);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 30px;position:sticky;top:0;z-index:10}.pageTitle{font-size:18px;font-weight:800}.mainContent{padding:30px;max-width:1320px;margin:auto}.view{display:none}.view.active{display:block}.hero{display:flex;justify-content:space-between;gap:24px;align-items:flex-end;margin-bottom:24px}.eyebrow{font-size:12px;color:var(--primary);font-weight:850;text-transform:uppercase;letter-spacing:.11em}.hero h1{font-size:34px;line-height:1.08;margin:8px 0}.hero p{color:var(--muted);max-width:700px;line-height:1.65}.btn{border:0;border-radius:11px;padding:12px 17px;background:var(--primary);color:#fff;font-weight:800}.btn:hover{background:var(--primary2)}.btn.secondary{background:#fff;color:var(--text);border:1px solid var(--line)}.btn.soft{background:var(--soft);color:var(--primary)}.grid{display:grid;gap:16px}.stats{grid-template-columns:repeat(4,minmax(0,1fr))}.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:20px}.stat .label{color:var(--muted);font-size:12px;font-weight:800}.stat .value{font-size:29px;font-weight:850;margin-top:9px}.stat .hint{font-size:12px;color:var(--muted);margin-top:5px}.two{grid-template-columns:1.2fr .8fr}.sectionTitle{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}.sectionTitle h2{font-size:17px;margin:0}.muted{color:var(--muted)}.progress{height:10px;border-radius:999px;background:#edf0f5;overflow:hidden}.progress>div{height:100%;background:var(--primary);border-radius:inherit}.fieldGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.field label{display:block;font-size:12px;font-weight:800;margin:0 0 7px}.field input,.field textarea,.field select{width:100%;padding:12px 13px;border:1px solid #d7deea;border-radius:11px;background:#fff;outline:none}.field textarea{min-height:150px;resize:vertical}.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--primary);box-shadow:0 0 0 4px rgba(49,94,251,.08)}.full{grid-column:1/-1}.skills{display:flex;gap:8px;flex-wrap:wrap}.skill{border:1px solid #dbe4f7;background:#f7f9fe;color:#2d4266;border-radius:999px;padding:6px 9px;font-size:12px;font-weight:750}.course{border:1px solid var(--line);border-radius:15px;padding:15px}.courseHead{display:flex;justify-content:space-between;gap:12px}.course h3{font-size:15px;margin:0 0 5px}.course a{color:var(--primary);font-weight:800;text-decoration:none;font-size:12px}.meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.tag{font-size:11px;font-weight:800;background:#f4f6fa;color:#596a84;padding:5px 8px;border-radius:8px}.gapItem{padding:15px;border:1px solid var(--line);border-radius:14px}.gapTop{display:flex;justify-content:space-between;gap:16px}.bar{height:7px;background:#eef1f6;border-radius:99px;margin-top:10px}.bar>div{height:100%;background:linear-gradient(90deg,#ffb347,#315efb);border-radius:99px}.road{display:grid;grid-template-columns:45px 1fr;gap:12px;align-items:start}.roadNum{width:34px;height:34px;border-radius:50%;background:var(--soft);color:var(--primary);display:grid;place-items:center;font-weight:850}.roadBody{padding-bottom:16px;border-bottom:1px solid var(--line)}.roadBody h4{margin:0 0 6px}.roadBody p{margin:0;color:var(--muted);font-size:13px;line-height:1.55}.historyRow{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:15px 0;border-bottom:1px solid var(--line)}.score{min-width:64px;height:64px;border-radius:50%;display:grid;place-items:center;background:var(--soft);color:var(--primary);font-size:18px;font-weight:900}.empty{padding:34px;text-align:center;color:var(--muted);border:1px dashed #ccd5e3;border-radius:14px}.toast{position:fixed;right:24px;bottom:24px;background:#152238;color:#fff;padding:12px 15px;border-radius:10px;box-shadow:var(--shadow);display:none;z-index:40}.toast.show{display:block}.loading{display:inline-flex;gap:8px;align-items:center}.dot{width:8px;height:8px;border-radius:50%;background:currentColor;animation:p 1s infinite alternate}.dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}@keyframes p{to{opacity:.2}}.notice{padding:12px 14px;border-radius:12px;background:#fff8e8;color:#835208;border:1px solid #f0dfb0;font-size:12px}.danger{color:var(--danger)}@media(max-width:1000px){.app{grid-template-columns:1fr}.sidebar{height:auto;position:static;border-right:0;border-bottom:1px solid var(--line)}.nav{grid-template-columns:repeat(3,1fr)}.sideBottom{display:none}.stats{grid-template-columns:repeat(2,1fr)}}@media(max-width:650px){.mainContent{padding:18px}.topbar{padding:0 18px}.hero{display:block}.fieldGrid,.two,.stats{grid-template-columns:1fr}.nav{grid-template-columns:repeat(2,1fr)}}
+</style></head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="brand">CareerPath <span>AI</span></div>
+  <nav class="nav">
+    <button data-view="overview" class="active">Overview</button>
+    <button data-view="profile">My Profile</button>
+    <button data-view="analyze">Career Analysis</button>
+    <button data-view="roadmap">Learning Roadmap</button>
+    <button data-view="history">Analysis History</button>
+    <button data-view="settings">Settings</button>
+  </nav>
+  <div class="sideBottom"><div class="userChip"><strong id="sideName">Your profile</strong><span id="sideEmail">Loading...</span></div></div>
+</aside>
+<main class="main">
+<header class="topbar"><div class="pageTitle" id="pageTitle">Overview</div><button class="btn secondary" id="logout">Sign out</button></header>
+<div class="mainContent">
+
+<section id="overview" class="view active">
+  <div class="hero"><div><div class="eyebrow">AI career guidance</div><h1>Turn your current skills into a clear next step.</h1><p>CareerPath AI compares your profile with a target role, finds the highest-impact skill gaps, and builds a practical learning path with current course options.</p></div><button class="btn" onclick="showView('analyze')">Start analysis</button></div>
+  <div class="grid stats">
+    <div class="card stat"><div class="label">Career readiness</div><div class="value" id="statScore">—</div><div class="hint">From your latest analysis</div></div>
+    <div class="card stat"><div class="label">Current level</div><div class="value" id="statLevel">—</div><div class="hint">AI-estimated proficiency</div></div>
+    <div class="card stat"><div class="label">Skill gaps</div><div class="value" id="statGaps">—</div><div class="hint">Prioritized for your target</div></div>
+    <div class="card stat"><div class="label">Courses</div><div class="value" id="statCourses">—</div><div class="hint">Recommended in latest run</div></div>
+  </div>
+  <div class="grid two" style="margin-top:16px">
+    <div class="card"><div class="sectionTitle"><h2>Profile completeness</h2><span id="completePct">0%</span></div><div class="progress"><div id="completeBar" style="width:0%"></div></div><p class="muted" id="completeText" style="font-size:13px;margin-top:12px">Add your profile and resume details to unlock a stronger analysis.</p></div>
+    <div class="card"><div class="sectionTitle"><h2>Latest target</h2></div><div id="latestTarget" class="empty">No analysis yet.</div></div>
+  </div>
+</section>
+
+<section id="profile" class="view">
+  <div class="hero"><div><div class="eyebrow">Your starting point</div><h1>My career profile</h1><p>Tell the system what you already know. The more concrete your details, the better the skill-gap analysis.</p></div><button class="btn" id="saveProfile">Save profile</button></div>
+  <div class="card">
+    <div class="fieldGrid">
+      <div class="field"><label>Full name</label><input id="fullName" placeholder="e.g. Rahul Sharma"></div>
+      <div class="field"><label>Current role / status</label><input id="currentRole" placeholder="e.g. BTech CSE student"></div>
+      <div class="field"><label>Target role</label><input id="targetRole" placeholder="e.g. Software Engineer"></div>
+      <div class="field"><label>Education</label><input id="education" placeholder="e.g. BTech Computer Science"></div>
+      <div class="field"><label>Experience (years)</label><input id="experience" type="number" min="0" step=".5" placeholder="0"></div>
+      <div class="field"><label>Goals</label><input id="goals" placeholder="e.g. Get an internship in AI/ML"></div>
+      <div class="field full"><label>Skills you currently hold</label><input id="skills" placeholder="C++, DSA, HTML, CSS, Git, Python"></div>
+      <div class="field full"><label>Resume / experience text</label><textarea id="resume" placeholder="Paste your resume text, projects, internships, coursework, achievements, certifications, etc."></textarea></div>
+      <div class="field full">
+        <label>Optional resume text file</label>
+        <input id="resumeFile" type="file" accept=".txt,.md,.csv,text/plain,text/markdown">
+        <div class="notice" style="margin-top:9px">For the most reliable analysis, paste the resume text above. Text/Markdown files can be loaded here; PDF/DOCX parsing is intentionally not claimed until a document parser is added.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="analyze" class="view">
+  <div class="hero"><div><div class="eyebrow">Gemini analysis</div><h1>Analyze my career gap</h1><p>Gemini evaluates your profile against the target role, then searches current web results for relevant learning options.</p></div></div>
+  <div class="card" id="analysisCard">
+    <div class="sectionTitle"><h2>Ready to analyze?</h2><span class="muted">Uses your saved profile</span></div>
+    <p class="muted" id="analysisHint">Save your profile first, then run the analysis.</p>
+    <button class="btn" id="runAnalysis">Run Gemini analysis</button>
+  </div>
+  <div id="analysisResult" style="margin-top:16px"></div>
+</section>
+
+<section id="roadmap" class="view">
+  <div class="hero"><div><div class="eyebrow">Your plan</div><h1>Learning roadmap</h1><p>Your latest analysis becomes a sequence of practical steps instead of a generic course list.</p></div></div>
+  <div id="roadmapBox" class="card empty">Run a career analysis to generate your roadmap.</div>
+</section>
+
+<section id="history" class="view">
+  <div class="hero"><div><div class="eyebrow">Progress over time</div><h1>Analysis history</h1><p>Keep prior analyses so you can compare readiness as your skills improve.</p></div></div>
+  <div class="card" id="historyBox"><div class="empty">Loading history...</div></div>
+</section>
+
+<section id="settings" class="view">
+  <div class="hero"><div><div class="eyebrow">Account</div><h1>Settings</h1><p>Manage your session and understand how AI is used in this portal.</p></div></div>
+  <div class="grid two">
+    <div class="card"><h2 style="margin-top:0">Signed-in account</h2><p class="muted" id="settingsEmail">Loading...</p><button class="btn secondary" id="settingsLogout">Sign out</button></div>
+    <div class="card"><h2 style="margin-top:0">How recommendations work</h2><p class="muted" style="line-height:1.7">Your profile is sent to the Gemini-powered analysis endpoint. The course-recommendation step uses Google Search grounding to look for current, relevant learning resources. Your account data and analysis history are scoped to your signed-in user.</p></div>
+  </div>
+</section>
+
+</div></main></div>
+<div id="toast" class="toast"></div>
+<script>
+const API=window.__HATCHABLE__.api;
+let profile=null,latest=null,history=[];
+const $=id=>document.getElementById(id);
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600)}
+function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function showView(id){document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===id));document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===id));$('pageTitle').textContent={overview:'Overview',profile:'My Profile',analyze:'Career Analysis',roadmap:'Learning Roadmap',history:'Analysis History',settings:'Settings'}[id]||'CareerPath AI';location.hash=id;if(id==='history')renderHistory();if(id==='roadmap')renderRoadmap()}
+document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>showView(b.dataset.view));
+async function api(path,opts={}){const r=await fetch(API+path,{headers:{'Content-Type':'application/json',...(opts.headers||{})},...opts});if(!r.ok){let e={};try{e=await r.json()}catch{};throw new Error(e.error||'Request failed')}return r.json()}
+async function load(){
+ const s=await hatchable.auth.getSession(); if(!s?.user){location.replace('/login?next='+encodeURIComponent(location.pathname+location.hash));return}
+ $('sideEmail').textContent=s.user.email||'';$('settingsEmail').textContent=s.user.email||'';$('sideName').textContent=s.user.name||'Your profile';
+ profile=await api('/profile');fillProfile(profile);renderOverview();history=await api('/analyses');latest=history[0]||null;renderOverview();renderHistory();
+ const h=location.hash.replace('#','');if(h&&document.getElementById(h))showView(h);
+}
+function fillProfile(p){profile=p||{};$('fullName').value=p?.full_name||'';$('currentRole').value=p?.current_role||'';$('targetRole').value=p?.target_role||'';$('education').value=p?.education||'';$('experience').value=p?.experience_years??'';$('goals').value=p?.goals||'';$('skills').value=(p?.skills||[]).join(', ');$('resume').value=p?.resume_text||''}
+function readForm(){return{full_name:$('fullName').value.trim(),current_role:$('currentRole').value.trim(),target_role:$('targetRole').value.trim(),education:$('education').value.trim(),experience_years:Number($('experience').value||0),goals:$('goals').value.trim(),skills:$('skills').value.split(',').map(x=>x.trim()).filter(Boolean),resume_text:$('resume').value.trim()}}
+$('resumeFile').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;if(!/\.txt$|\.md$|\.csv$/i.test(f.name)){toast('Please paste PDF/DOCX content into the resume box.');return}$('resume').value=await f.text();toast('Resume text loaded.')});
+$('saveProfile').onclick=async()=>{try{profile=await api('/profile',{method:'POST',body:JSON.stringify(readForm())});fillProfile(profile);renderOverview();toast('Profile saved successfully.')}catch(e){toast(e.message)}};
+function renderOverview(){const fields=['full_name','current_role','target_role','education','skills','resume_text','goals'];const done=fields.filter(k=>profile?.[k]&&(Array.isArray(profile[k])?profile[k].length:1)).length;const pct=Math.round(done/fields.length*100);$('completePct').textContent=pct+'%';$('completeBar').style.width=pct+'%';$('completeText').textContent=pct===100?'Your profile is ready for a detailed analysis.':'Complete your profile to improve the quality of your analysis.';$('statScore').textContent=latest?.readiness_score!=null?Math.round(latest.readiness_score)+'%':'—';$('statLevel').textContent=latest?.current_level||'—';$('statGaps').textContent=latest?.skill_gaps?.length??'—';$('statCourses').textContent=latest?.courses?.length??'—';$('latestTarget').innerHTML=latest?'<strong>'+escapeHtml(latest.target_role)+'</strong><div class="muted" style="margin-top:6px">'+escapeHtml(latest.summary||'Latest AI analysis available.')+'</div>':'<div class="empty">No analysis yet.</div>'}
+$('runAnalysis').onclick=async()=>{try{if(!profile?.target_role){toast('Add a target role in My Profile first.');showView('profile');return}$('runAnalysis').disabled=true;$('runAnalysis').innerHTML='<span class="loading">Analyzing <span class="dot"></span><span class="dot"></span><span class="dot"></span></span>';$('analysisResult').innerHTML='<div class="card"><div class="loading">Gemini is assessing your profile and searching current course options... <span class="dot"></span><span class="dot"></span><span class="dot"></span></div></div>';const r=await api('/analyze',{method:'POST',body:JSON.stringify(profile)});latest=r.analysis;history.unshift(latest);renderAnalysis(latest);renderOverview();renderRoadmap();toast('Analysis completed.')}catch(e){$('analysisResult').innerHTML='<div class="card danger">'+escapeHtml(e.message)+'</div>'}finally{$('runAnalysis').disabled=false;$('runAnalysis').textContent='Run Gemini analysis'}};
+function renderAnalysis(a){const gaps=(a.skill_gaps||[]).map(g=>'<div class="gapItem"><div class="gapTop"><strong>'+escapeHtml(g.skill)+'</strong><span class="muted">'+escapeHtml(g.priority||'Priority')+'</span></div><div class="muted" style="margin-top:6px;font-size:13px">'+escapeHtml(g.reason||'')+'</div><div class="bar"><div style="width:'+Math.max(5,Math.min(100,Number(g.gap_score||50)))+'%"></div></div></div>').join('');const courses=(a.courses||[]).map(c=>'<div class="course"><div class="courseHead"><div><h3>'+escapeHtml(c.title)+'</h3><div class="muted" style="font-size:12px">'+escapeHtml(c.provider||'Learning provider')+'</div></div><strong>'+escapeHtml(c.rating?String(c.rating)+' ★':'Recommended')+'</strong></div><div class="meta"><span class="tag">'+escapeHtml(c.level||'All levels')+'</span><span class="tag">'+escapeHtml(c.duration||'Varies')+'</span><span class="tag">'+escapeHtml(c.price||'See provider')+'</span></div><p class="muted" style="font-size:13px;line-height:1.5">'+escapeHtml(c.reason||'Relevant to your target role.')+'</p>'+(c.url?'<a href="'+escapeHtml(c.url)+'" target="_blank" rel="noopener">Open course ↗</a>':'')+'</div>').join('');$('analysisResult').innerHTML='<div class="grid two"><div class="card"><div class="sectionTitle"><h2>Readiness</h2><div class="score">'+Math.round(a.readiness_score||0)+'%</div></div><p class="muted">'+escapeHtml(a.summary||'')+'</p><h3>Current level</h3><p><strong>'+escapeHtml(a.current_level||'Estimated')+'</strong></p><h3>Strengths</h3><div class="skills">'+(a.strengths||[]).map(s=>'<span class="skill">'+escapeHtml(s)+'</span>').join('')+'</div></div><div class="card"><div class="sectionTitle"><h2>Priority skill gaps</h2></div><div class="grid">'+(gaps||'<div class="empty">No major gaps returned.</div>')+'</div></div></div><div class="card" style="margin-top:16px"><div class="sectionTitle"><h2>Course recommendations</h2><span class="muted">Grounded in current web results</span></div><div class="grid two">'+(courses||'<div class="empty">No course recommendations returned.</div>')+'</div></div>'}
+function renderRoadmap(){if(!latest){$('roadmapBox').innerHTML='Run a career analysis to generate your roadmap.';return}const items=latest.roadmap||[];$('roadmapBox').innerHTML=(items.length?items.map((x,i)=>'<div class="road"><div class="roadNum">'+(i+1)+'</div><div class="roadBody"><h4>'+escapeHtml(x.title||x.skill||'Step '+(i+1))+'</h4><p>'+escapeHtml(x.description||'')+'</p><div class="meta"><span class="tag">'+escapeHtml(x.timeframe||'Self-paced')+'</span><span class="tag">'+escapeHtml(x.priority||'Core')+'</span></div></div></div>').join(''):'<div class="empty">No roadmap steps available.</div>')}
+function renderHistory(){if(!history.length){$('historyBox').innerHTML='<div class="empty">No analyses yet. Run your first career analysis.</div>';return}$('historyBox').innerHTML=history.map(a=>'<div class="historyRow"><div><strong>'+escapeHtml(a.target_role)+'</strong><div class="muted" style="font-size:12px;margin-top:4px">'+new Date(a.created_at).toLocaleString()+'</div></div><div style="display:flex;align-items:center;gap:12px"><span class="tag">'+escapeHtml(a.current_level||'Level')+'</span><div class="score">'+Math.round(a.readiness_score||0)+'%</div></div></div>').join('')}
+$('logout').onclick=$('settingsLogout').onclick=async()=>{await hatchable.auth.signOut();location.replace('/login')};
+load();
+</script></body></html>

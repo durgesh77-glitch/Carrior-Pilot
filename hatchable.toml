@@ -1,0 +1,8 @@
+[ai]
+required = true
+pin = "google"
+description = "Gemini powers career analysis, skill-gap detection, and grounded course recommendations."
+
+[auth]
+enabled = true
+providers = ["email"]
