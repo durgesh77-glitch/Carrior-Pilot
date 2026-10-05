@@ -5,27 +5,20 @@ export const methods = ["POST"];
 
 const SYSTEM = `You are CareerPath AI, a practical career guidance engine.
 Analyze a person's current profile against their target role.
-Estimate current level from evidence, identify concrete skill gaps, and produce an ordered learning roadmap.
 
-Recommend reputable, relevant learning resources from your knowledge. Do NOT invent ratings, prices, durations, or URLs. Only provide a URL when you are confident it is a real public course/resource URL; otherwise use an empty string. Prefer well-known providers such as Coursera, edX, Udemy, freeCodeCamp, official documentation, YouTube learning playlists, and university resources.
+Your job:
+1. Estimate current proficiency level from the evidence provided.
+2. Identify concrete skill gaps for the target role.
+3. Prioritize the gaps.
+4. Build an ordered learning roadmap.
+5. Recommend relevant learning resources/courses.
 
-Return ONLY valid JSON:
-{
-  "readiness_score": 0,
-  "current_level": "Beginner|Intermediate|Advanced",
-  "summary": "2-4 sentence assessment",
-  "strengths": ["..."],
-  "skill_gaps": [{"skill":"...","priority":"High|Medium|Low","gap_score":0,"reason":"..."}],
-  "roadmap": [{"title":"...","description":"...","timeframe":"...","priority":"Core|Support"}],
-  "courses": [{"title":"...","provider":"...","rating":"","level":"...","duration":"","price":"","reason":"...","url":""}],
-  "sources": []
-}`;
+Be realistic and constructive. Do not invent facts. Do not claim an exact course rating, price, duration, or URL unless you are confident it is correct. Prefer reputable providers such as Coursera, edX, Udemy, freeCodeCamp, official documentation, university courses, and reputable YouTube courses.
+
+Return ONLY valid JSON matching the requested schema.`;
 
 function parseJson(text) {
-  const cleaned = String(text || "")
-    .replace(/```json/gi, "")
-    .replace(/```/g, "")
-    .trim();
+  const cleaned = String(text || "").replace(/```json/gi, "").replace(/```/g, "").trim();
   try { return JSON.parse(cleaned); } catch {}
   const s = cleaned.indexOf("{");
   const e = cleaned.lastIndexOf("}");
@@ -40,7 +33,9 @@ export default async function(req, res) {
   const target = String(b.target_role || "").trim();
   if (!target) return res.status(400).json({ error: "Target role is required." });
 
+  const apiKey = await config.get("GEMINI_API_KEY");
   const skills = Array.isArray(b.skills) ? b.skills.filter(Boolean) : [];
+
   const prompt = `Candidate profile:
 Name: ${String(b.full_name || "")}
 Current role/status: ${String(b.current_role || "")}
@@ -53,47 +48,63 @@ ${String(b.resume_text || "No resume text provided.")}
 
 Target role: ${target}
 
-Assess readiness, identify the most important gaps, create a practical learning roadmap, and recommend 5-8 relevant learning resources.`;
+Assess the candidate against this target role and recommend 5-8 relevant learning resources. Prefer resources that directly address the identified gaps. If you know a reliable course URL, include it; otherwise leave url empty.`;
 
   try {
-    const apiKey = await config.get("OPENROUTER_API_KEY");
-    const upstream = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      timeout_ms: 55000,
-      headers: {
-        "Authorization": `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-        "HTTP-Referer": "https://careerpath-ai-9g2v.hatchable.site",
-        "X-Title": "CareerPath AI"
-      },
-      body: JSON.stringify({
-        model: "openrouter/free",
-        messages: [
-          { role: "system", content: SYSTEM },
-          { role: "user", content: prompt }
-        ],
-        temperature: 0.2
-      })
-    });
+    const upstream = await fetch(
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent",
+      {
+        method: "POST",
+        timeout_ms: 55000,
+        headers: {
+          "Content-Type": "application/json",
+          "x-goog-api-key": apiKey
+        },
+        body: JSON.stringify({
+          system_instruction: {
+            parts: [{ text: SYSTEM }]
+          },
+          contents: [
+            {
+              role: "user",
+              parts: [{ text: prompt }]
+            }
+          ],
+          tools: [
+            { google_search: {} }
+          ],
+          generationConfig: {
+            responseMimeType: "application/json"
+          }
+        })
+      }
+    );
 
     if (!upstream.ok) {
-      const body = await upstream.text().catch(() => "");
-      console.error("openrouter upstream error", { status: upstream.status, body: body.slice(0, 300) });
-      if (upstream.status === 401 || upstream.status === 403) {
-        return res.status(502).json({ error: "OpenRouter authentication failed. Check the OPENROUTER_API_KEY in Hatchable Setup." });
+      const bodyText = await upstream.text().catch(() => "");
+      console.error("gemini upstream error", { status: upstream.status, body: bodyText.slice(0, 500) });
+
+      if (upstream.status === 400 || upstream.status === 403) {
+        return res.status(502).json({
+          error: "Gemini rejected the API request. Check that your Gemini API key is valid and enabled for the Gemini API."
+        });
       }
       if (upstream.status === 429) {
-        return res.status(429).json({ error: "The free AI model is currently rate-limited. Please retry later." });
+        return res.status(429).json({
+          error: "Gemini rate limit/quota was reached. Please wait and retry, or use a key with available quota."
+        });
       }
-      return res.status(502).json({ error: "Free AI service is temporarily unavailable." });
+      return res.status(502).json({ error: "Gemini is temporarily unavailable." });
     }
 
     const data = await upstream.json();
-    const text = data?.choices?.[0]?.message?.content || "";
+    const text = data?.candidates?.[0]?.content?.parts?.map(p => p.text || "").join("") || "";
     const parsed = parseJson(text);
 
     if (!parsed) {
-      return res.status(502).json({ error: "The AI returned an unexpected format. Please retry the analysis." });
+      return res.status(502).json({
+        error: "Gemini returned an unexpected format. Please retry the analysis."
+      });
     }
 
     const safe = {
@@ -107,10 +118,11 @@ Assess readiness, identify the most important gaps, create a practical learning 
       sources: Array.isArray(parsed.sources) ? parsed.sources.slice(0, 20) : []
     };
 
-    const ins = await db.query(`INSERT INTO career_analyses
-      (user_id,target_role,readiness_score,current_level,summary,strengths,skill_gaps,roadmap,courses,sources)
-      VALUES ($1,$2,$3,$4,$5,$6::jsonb,$7::jsonb,$8::jsonb,$9::jsonb,$10::jsonb)
-      RETURNING id,target_role,readiness_score,current_level,summary,strengths,skill_gaps,roadmap,courses,sources,created_at`,
+    const ins = await db.query(
+      `INSERT INTO career_analyses
+       (user_id,target_role,readiness_score,current_level,summary,strengths,skill_gaps,roadmap,courses,sources)
+       VALUES ($1,$2,$3,$4,$5,$6::jsonb,$7::jsonb,$8::jsonb,$9::jsonb,$10::jsonb)
+       RETURNING id,target_role,readiness_score,current_level,summary,strengths,skill_gaps,roadmap,courses,sources,created_at`,
       [
         req.user.id,
         target,
@@ -127,15 +139,19 @@ Assess readiness, identify the most important gaps, create a practical learning 
 
     res.json({
       analysis: ins.rows[0],
-      provider: "OpenRouter",
-      model: "openrouter/free"
+      provider: "Google Gemini",
+      model: "gemini-3.8-flash"
     });
   } catch (e) {
     console.error("career-analysis", e);
     const msg = String(e?.message || e);
-    if (msg.includes("setup_required") || msg.includes("OPENROUTER_API_KEY")) {
-      return res.status(503).json({ error: "OpenRouter is not configured yet. Add OPENROUTER_API_KEY in Hatchable Setup." });
+    if (msg.includes("GEMINI_API_KEY") || msg.includes("Configuration value")) {
+      return res.status(503).json({
+        error: "Gemini is not configured yet. Add GEMINI_API_KEY in Hatchable Setup."
+      });
     }
-    return res.status(502).json({ error: "Free AI analysis failed. Please try again." });
+    return res.status(502).json({
+      error: "Gemini analysis failed. Please try again."
+    });
   }
 }

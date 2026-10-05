@@ -1,12 +1,3 @@
-[ai]
-required = false
-description = "AI features use an OpenRouter free-tier model through a server-side API key."
-
-[[secret]]
-name = "OPENROUTER_API_KEY"
-required = true
-description = "OpenRouter API key for free-tier AI inference."
-
 [db.tables.career_profiles]
 read = "own"
 write = "own"
@@ -14,6 +5,11 @@ write = "own"
 [db.tables.career_analyses]
 read = "own"
 write = "own"
+
+[[secret]]
+name = "GEMINI_API_KEY"
+required = true
+description = "Google Gemini API key used for CareerPath AI analysis."
 
 [auth]
 enabled = true
