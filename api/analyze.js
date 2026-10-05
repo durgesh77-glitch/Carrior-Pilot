@@ -52,7 +52,7 @@ Assess the candidate against this target role and recommend 5-8 relevant learnin
 
   try {
     const upstream = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent",
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent",
       {
         method: "POST",
         timeout_ms: 55000,
@@ -69,9 +69,6 @@ Assess the candidate against this target role and recommend 5-8 relevant learnin
               role: "user",
               parts: [{ text: prompt }]
             }
-          ],
-          tools: [
-            { google_search: {} }
           ],
           generationConfig: {
             responseMimeType: "application/json"
