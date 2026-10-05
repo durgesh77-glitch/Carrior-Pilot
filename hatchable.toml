@@ -1,7 +1,19 @@
 [ai]
+required = false
+description = "AI features use an OpenRouter free-tier model through a server-side API key."
+
+[[secret]]
+name = "OPENROUTER_API_KEY"
 required = true
-pin = "google"
-description = "Gemini powers career analysis, skill-gap detection, and grounded course recommendations."
+description = "OpenRouter API key for free-tier AI inference."
+
+[db.tables.career_profiles]
+read = "own"
+write = "own"
+
+[db.tables.career_analyses]
+read = "own"
+write = "own"
 
 [auth]
 enabled = true
