@@ -15,7 +15,43 @@ Your job:
 
 Be realistic and constructive. Do not invent facts. Do not claim an exact course rating, price, duration, or URL unless you are confident it is correct. Prefer reputable providers such as Coursera, edX, Udemy, freeCodeCamp, official documentation, university courses, and reputable YouTube courses.
 
-Return ONLY valid JSON matching the requested schema.`;
+Return ONLY valid JSON with EXACTLY these keys:
+{
+  "readiness_score": 0,
+  "current_level": "Beginner",
+  "summary": "2-4 sentence assessment",
+  "strengths": ["skill or strength"],
+  "skill_gaps": [
+    {
+      "skill": "skill name",
+      "priority": "High",
+      "gap_score": 70,
+      "reason": "why this is a gap"
+    }
+  ],
+  "roadmap": [
+    {
+      "title": "step title",
+      "description": "what to learn/do",
+      "timeframe": "4 weeks",
+      "priority": "Core"
+    }
+  ],
+  "courses": [
+    {
+      "title": "course/resource title",
+      "provider": "provider",
+      "rating": "",
+      "level": "Beginner",
+      "duration": "",
+      "price": "",
+      "reason": "why relevant",
+      "url": ""
+    }
+  ],
+  "sources": []
+}
+Never omit a required key. Use empty arrays or empty strings when a value is unavailable. Keep readiness_score between 0 and 100.`;
 
 function parseJson(text) {
   const cleaned = String(text || "").replace(/```json/gi, "").replace(/```/g, "").trim();
