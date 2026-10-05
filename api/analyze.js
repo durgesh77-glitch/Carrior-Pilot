@@ -56,71 +56,114 @@ Target role: ${target}
 
 Assess the candidate against this target role and recommend 5-8 relevant learning resources. Prefer resources that directly address the identified gaps. If you know a reliable course URL, include it; otherwise leave url empty.`;
 
-  try {
-    const upstream = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent",
+  const requestBody = () => JSON.stringify({
+    system_instruction: {
+      parts: [{ text: SYSTEM }]
+    },
+    contents: [
       {
-        method: "POST",
-        timeout_ms: 55000,
-        headers: {
-          "Content-Type": "application/json",
-          "x-goog-api-key": apiKey
-        },
-        body: JSON.stringify({
-          system_instruction: {
-            parts: [{ text: SYSTEM }]
+        role: "user",
+        parts: [{ text: prompt }]
+      }
+    ],
+    generationConfig: {
+      responseMimeType: "application/json"
+    }
+  });
+
+  try {
+    let parsed = null;
+    let lastText = "";
+    let lastStatus = 200;
+
+    for (let attempt = 0; attempt < 2 && !parsed; attempt++) {
+      const upstream = await fetch(
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent",
+        {
+          method: "POST",
+          timeout_ms: 55000,
+          headers: {
+            "Content-Type": "application/json",
+            "x-goog-api-key": apiKey
           },
-          contents: [
-            {
-              role: "user",
-              parts: [{ text: prompt }]
-            }
-          ],
-          generationConfig: {
-            responseMimeType: "application/json"
-          }
-        })
-      }
-    );
+          body: requestBody()
+        }
+      );
 
-    if (!upstream.ok) {
-      const bodyText = await upstream.text().catch(() => "");
-      console.error("gemini upstream error", { status: upstream.status, body: bodyText.slice(0, 500) });
+      lastStatus = upstream.status;
 
-      if (upstream.status === 400 || upstream.status === 403) {
-        return res.status(502).json({
-          error: "Gemini rejected the API request. Check that your Gemini API key is valid and enabled for the Gemini API."
-        });
+      if (!upstream.ok) {
+        const bodyText = await upstream.text().catch(() => "");
+        console.error("gemini upstream error", { status: upstream.status, body: bodyText.slice(0, 500) });
+
+        if (upstream.status === 400 || upstream.status === 403) {
+          return res.status(502).json({
+            error: "Gemini rejected the API request. Check that your Gemini API key is valid and enabled for the Gemini API."
+          });
+        }
+        if (upstream.status === 429) {
+          return res.status(429).json({
+            error: "Gemini rate limit/quota was reached. Please wait and retry, or use a key with available quota."
+          });
+        }
+        return res.status(502).json({ error: "Gemini is temporarily unavailable." });
       }
-      if (upstream.status === 429) {
-        return res.status(429).json({
-          error: "Gemini rate limit/quota was reached. Please wait and retry, or use a key with available quota."
-        });
+
+      const data = await upstream.json();
+      lastText = data?.candidates?.[0]?.content?.parts?.map(p => p.text || "").join("") || "";
+      parsed = parseJson(lastText);
+
+      if (!parsed || typeof parsed !== "object") {
+        parsed = null;
+        if (attempt === 0) continue;
       }
-      return res.status(502).json({ error: "Gemini is temporarily unavailable." });
     }
 
-    const data = await upstream.json();
-    const text = data?.candidates?.[0]?.content?.parts?.map(p => p.text || "").join("") || "";
-    const parsed = parseJson(text);
-
-    if (!parsed || typeof parsed !== "object" || !parsed.summary || !parsed.current_level) {
-      console.error("gemini invalid analysis", { textPreview: String(text).slice(0, 600) });
+    if (!parsed) {
+      console.error("gemini invalid analysis", { status: lastStatus, textPreview: String(lastText).slice(0, 600) });
       return res.status(502).json({
         error: "Gemini returned an incomplete analysis. Please retry once."
       });
     }
 
+    const toText = value => Array.isArray(value) ? value.map(v => typeof v === "string" ? v : (v?.title || v?.skill || v?.name || JSON.stringify(v))).filter(Boolean) : [];
+
     const safe = {
-      readiness_score: Math.max(0, Math.min(100, Number(parsed.readiness_score || 0))),
-      current_level: String(parsed.current_level || "Intermediate"),
-      summary: String(parsed.summary || ""),
-      strengths: Array.isArray(parsed.strengths) ? parsed.strengths.slice(0, 12) : [],
-      skill_gaps: Array.isArray(parsed.skill_gaps) ? parsed.skill_gaps.slice(0, 12) : [],
-      roadmap: Array.isArray(parsed.roadmap) ? parsed.roadmap.slice(0, 12) : [],
-      courses: Array.isArray(parsed.courses) ? parsed.courses.slice(0, 10) : [],
-      sources: Array.isArray(parsed.sources) ? parsed.sources.slice(0, 20) : []
+      readiness_score: Math.max(0, Math.min(100, Number(parsed.readiness_score || parsed.readiness || 0))),
+      current_level: String(parsed.current_level || parsed.level || "Intermediate"),
+      summary: String(parsed.summary || parsed.assessment || "AI analysis completed."),
+      strengths: toText(parsed.strengths).slice(0, 12),
+      skill_gaps: Array.isArray(parsed.skill_gaps)
+        ? parsed.skill_gaps.slice(0, 12).map(g => typeof g === "string" ? { skill: g, priority: "High", gap_score: 60, reason: "Relevant gap for the target role." } : g)
+        : [],
+      roadmap: Array.isArray(parsed.roadmap)
+        ? parsed.roadmap.slice(0, 12).map((x, i) => typeof x === "string" ? { title: x, description: "", timeframe: "", priority: "Core", order: i + 1 } : ({
+            title: x.title || x.phase || `Step ${i + 1}`,
+            description: x.description || (Array.isArray(x.tasks) ? x.tasks.join("; ") : (Array.isArray(x.actions) ? x.actions.join("; ") : "")),
+            timeframe: x.timeframe || x.duration || "",
+            priority: x.priority || "Core"
+          }))
+        : [],
+      courses: Array.isArray(parsed.courses)
+        ? parsed.courses.slice(0, 10).map(c => typeof c === "string" ? { title: c, provider: "", rating: "", level: "", duration: "", price: "", reason: "", url: "" } : ({
+            title: c.title || c.name || "Recommended resource",
+            provider: c.provider || c.platform || "",
+            rating: c.rating || "",
+            level: c.level || "",
+            duration: c.duration || "",
+            price: c.price || c.type || "",
+            reason: c.reason || "",
+            url: c.url || ""
+          }))
+        : [],
+      sources: toText(parsed.sources).slice(0, 20)
     };
+
+    if (!safe.current_level || !safe.summary) {
+      return res.status(502).json({
+        error: "Gemini returned an incomplete analysis. Please retry once."
+      });
+    }
 
     const ins = await db.query(
       `INSERT INTO career_analyses
