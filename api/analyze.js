@@ -19,11 +19,17 @@ Return ONLY valid JSON matching the requested schema.`;
 
 function parseJson(text) {
   const cleaned = String(text || "").replace(/```json/gi, "").replace(/```/g, "").trim();
-  try { return JSON.parse(cleaned); } catch {}
+  try {
+    const parsed = JSON.parse(cleaned);
+    if (parsed && typeof parsed === "object") return parsed;
+  } catch {}
   const s = cleaned.indexOf("{");
   const e = cleaned.lastIndexOf("}");
   if (s >= 0 && e > s) {
-    try { return JSON.parse(cleaned.slice(s, e + 1)); } catch {}
+    try {
+      const parsed = JSON.parse(cleaned.slice(s, e + 1));
+      if (parsed && typeof parsed === "object") return parsed;
+    } catch {}
   }
   return null;
 }
@@ -98,9 +104,10 @@ Assess the candidate against this target role and recommend 5-8 relevant learnin
     const text = data?.candidates?.[0]?.content?.parts?.map(p => p.text || "").join("") || "";
     const parsed = parseJson(text);
 
-    if (!parsed) {
+    if (!parsed || typeof parsed !== "object" || !parsed.summary || !parsed.current_level) {
+      console.error("gemini invalid analysis", { textPreview: String(text).slice(0, 600) });
       return res.status(502).json({
-        error: "Gemini returned an unexpected format. Please retry the analysis."
+        error: "Gemini returned an incomplete analysis. Please retry once."
       });
     }
 
@@ -137,7 +144,7 @@ Assess the candidate against this target role and recommend 5-8 relevant learnin
     res.json({
       analysis: ins.rows[0],
       provider: "Google Gemini",
-      model: "gemini-3.8-flash"
+      model: "gemini-3.5-flash-lite"
     });
   } catch (e) {
     console.error("career-analysis", e);
